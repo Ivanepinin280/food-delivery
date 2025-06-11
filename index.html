@@ -2,158 +2,304 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Доставка еды</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- ... ваш CSS без изменений ... -->
+  <title>Заказ еды</title>
   <style>
-    /* ... ваш CSS ... */
+    body {
+      background: #23272b;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    h1, h2 {
+      color: #ffd600;
+    }
+    .categories {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .category-btn {
+      background: #333;
+      color: #ffd600;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background 0.2s;
+    }
+    .category-btn.active, .category-btn:hover {
+      background: #ffd600;
+      color: #23272b;
+    }
+    .menu-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+    }
+    .card {
+      background: #2c2f34;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0004;
+      width: 220px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card img {
+      width: 120px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #ffd600;
+    }
+    .card-price {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+    .card-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .add-btn {
+      background: #ffd600;
+      color: #23272b;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .remove-btn {
+      background: #ff1744;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .cart {
+      background: #23272b;
+      border-radius: 12px;
+      margin-top: 32px;
+      padding: 18px;
+      box-shadow: 0 2px 8px #0004;
+    }
+    .cart-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 12px 0;
+    }
+    .cart-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .cart-total {
+      font-size: 20px;
+      color: #ffd600;
+      margin-bottom: 12px;
+    }
+    .order-form input, .order-form select {
+      padding: 8px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: none;
+      width: 100%;
+      font-size: 16px;
+    }
+    .order-btn {
+      background: #ffd600;
+      color: #23272b;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 24px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    .order-success {
+      color: #00e676;
+      font-size: 18px;
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- ... ваш HTML без изменений ... -->
+    <h1>Заказ еды</h1>
+    <div class="categories" id="categories"></div>
+    <div class="menu-list" id="menu"></div>
+    <div class="cart" id="cart" style="display:none;">
+      <h2>Корзина</h2>
+      <ul class="cart-list" id="cart-list"></ul>
+      <div class="cart-total" id="cart-total"></div>
+      <form class="order-form" id="order-form">
+        <input type="text" id="name" placeholder="Имя" required>
+        <input type="tel" id="phone" placeholder="Телефон" required>
+        <input type="text" id="address" placeholder="Адрес доставки" required>
+        <select id="payment" required>
+          <option value="">Оплата</option>
+          <option value="cash">Наличные</option>
+          <option value="card">Картой</option>
+        </select>
+        <button type="submit" class="order-btn">Оформить заказ</button>
+      </form>
+      <div class="order-success" id="order-success"></div>
+    </div>
   </div>
   <script>
-    // ВСТАВЬТЕ СЮДА ВАШ URL Google Apps Script:
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrm1Nnx2cgXGBG3HYxyyXumZYsBGuoCyidjVGYhGoqURCyVJueBCtMZgEC-BI9HJwZ/exec';
-    const CURRENCY = "฿";
-    let MENU = [];
-    let orderState = {};
+    // Ваша ссылка Google Apps Script
+    const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
-    // Функция группировки меню (без изменений)
-    function groupMenuByCategory(menu) {
-      const cats = {};
-      menu.forEach(item => {
-        const category = (item['category'] || 'Без категории').trim();
-        if (
-          item['name'] && item['name'].trim() !== "" &&
-          !isNaN(Number(item['price'])) && item['price'] !== "" &&
-          (item['available'] === undefined || String(item['available']).toUpperCase() === "TRUE")
-        ) {
-          if (!cats[category]) cats[category] = [];
-          cats[category].push({
-            name: item['name'].trim(),
-            price: Number(item['price']),
-            img: (item['img'] || '').trim()
-          });
-        }
-      });
-      return Object.keys(cats)
-        .filter(cat => cats[cat].length > 0)
-        .map(cat => ({category: cat, items: cats[cat]}));
-    }
+    let menuData = [];
+    const categories = ['Супы', 'Горячее', 'Гарнир', 'Соусы', 'Напитки'];
+    let selectedCategory = categories[0];
+    let cart = {};
 
-    // Загрузка меню из Google Таблицы через GET
-    function loadMenu() {
-      fetch(GOOGLE_SCRIPT_URL)
-        .then(res => res.json())
-        .then(data => {
-          MENU = groupMenuByCategory(data.menu || []);
-          orderState = {};
+    function renderCategories() {
+      const catDiv = document.getElementById('categories');
+      catDiv.innerHTML = '';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'category-btn' + (cat === selectedCategory ? ' active' : '');
+        btn.textContent = cat;
+        btn.onclick = () => {
+          selectedCategory = cat;
+          renderCategories();
           renderMenu();
-        })
-        .catch(() => {
-          document.getElementById('menu-root').innerHTML = '<p>Ошибка загрузки меню :(</p>';
-        });
+        };
+        catDiv.appendChild(btn);
+      });
     }
-
-    // ... функция renderMenu и остальные функции без изменений ...
 
     function renderMenu() {
-      // ... без изменений ...
-      // (можно скопировать ваш код)
-      // Просто для краткости тут не вставляю полностью
-      // Если надо – вставлю полностью!
-    }
-
-    function calcOrderTotal() {
-      let total = 0;
-      MENU.forEach(cat => {
-        cat.items.forEach(item => {
-          total += (orderState[item.name]||0) * item.price;
+      const menuDiv = document.getElementById('menu');
+      menuDiv.innerHTML = '';
+      menuData
+        .filter(item => item.category.trim() === selectedCategory && item.available)
+        .forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${item.img}" alt="${item.name}">
+            <div class="card-title">${item.name}</div>
+            <div class="card-price">${item.price} ₽</div>
+            <div class="card-controls">
+              <button class="remove-btn" onclick="updateCart(${item.id}, -1)">-</button>
+              <span id="qty-${item.id}">${cart[item.id]?.qty || 0}</span>
+              <button class="add-btn" onclick="updateCart(${item.id}, 1)">+</button>
+            </div>
+          `;
+          menuDiv.appendChild(card);
         });
-      });
-      return total;
-    }
-    function updateOrderTotal() {
-      const total = calcOrderTotal();
-      document.querySelector('#order-total .order-total-currency').textContent = total + " " + CURRENCY;
-      document.getElementById('save-order-btn').textContent = "Сохранить заказ (" + total + " " + CURRENCY + ")";
     }
 
-    // Переключение вкладок (без изменений)
-    const tabs = ["menu", "delivery", "contacts"];
-    tabs.forEach(tab => {
-      document.getElementById('tab-' + tab).onclick = () => {
-        tabs.forEach(t => {
-          document.getElementById('tab-' + t).classList.remove('active');
-          document.getElementById('section-' + t).classList.remove('active');
-        });
-        document.getElementById('tab-' + tab).classList.add('active');
-        document.getElementById('section-' + tab).classList.add('active');
-      };
-    });
-
-    // Сохраняем заказ
-    let order = {};
-    document.getElementById('menu-form').onsubmit = function(e) {
-      e.preventDefault();
-      const data = {};
-      Object.keys(orderState).forEach(dish => {
-        if (orderState[dish] > 0) data[dish] = orderState[dish];
-      });
-      order = data;
-      if (Object.keys(order).length === 0) {
-        alert("Пожалуйста, выберите продукты в меню!");
-        return;
-      }
-      alert("Заказ сохранен. Перейдите во вкладку 'Доставка' для оформления.");
-      document.getElementById('tab-delivery').click();
+    window.updateCart = function(id, delta) {
+      const item = menuData.find(i => Number(i.id) === Number(id));
+      if (!item) return;
+      if (!cart[id]) cart[id] = { ...item, qty: 0 };
+      let newQty = cart[id].qty + delta;
+      newQty = Math.max(0, newQty);
+      cart[id].qty = newQty;
+      if (cart[id].qty === 0) delete cart[id];
+      document.getElementById(`qty-${id}`).textContent = cart[id]?.qty || 0;
+      renderCart();
     };
 
-    // Оформление доставки через GET (решение CORS)
-    document.getElementById('delivery-form').onsubmit = function(e) {
-      e.preventDefault();
-      if (!order || Object.keys(order).length === 0) {
-        alert("Пожалуйста, выберите продукты в меню!");
-        document.getElementById('tab-menu').click();
+    function renderCart() {
+      const cartDiv = document.getElementById('cart');
+      const cartList = document.getElementById('cart-list');
+      const cartTotal = document.getElementById('cart-total');
+      const items = Object.values(cart);
+      if (items.length === 0) {
+        cartDiv.style.display = 'none';
         return;
       }
+      cartDiv.style.display = 'block';
+      cartList.innerHTML = '';
+      let total = 0;
+      items.forEach(item => {
+        total += Number(item.price) * item.qty;
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${item.name} x ${item.qty}</span>
+          <span>${Number(item.price) * item.qty} ₽</span>
+        `;
+        cartList.appendChild(li);
+      });
+      cartTotal.textContent = `Итого: ${total} ₽`;
+    }
+
+    document.getElementById('order-form').onsubmit = async function(e) {
+      e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
-      if (!name || !phone || !address) {
-        alert("Пожалуйста, заполните все поля!");
-        return;
-      }
+      const payment = document.getElementById('payment').value;
+      const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
+      const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
-      // Формируем строку заказа
-      const orderStr = encodeURIComponent(JSON.stringify(order));
-      // Формируем GET-запрос (ВНИМАНИЕ: если заказ большой — может не поместиться в URL)
-      const url = GOOGLE_SCRIPT_URL + 
-        '?action=order' +
-        '&name=' + encodeURIComponent(name) +
-        '&phone=' + encodeURIComponent(phone) +
-        '&address=' + encodeURIComponent(address) +
-        '&order=' + orderStr;
-
-      fetch(url)
-        .then(r => r.json())
-        .then(resp => {
-          alert("Спасибо за заказ! Мы свяжемся с вами.");
-          order = {};
-          orderState = {};
-          loadMenu();
-          document.getElementById('delivery-form').reset();
-          document.getElementById('tab-menu').click();
-        })
-        .catch(() => {
-          alert("Ошибка отправки заказа!");
+      try {
+        await fetch(MENU_URL, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, phone, address, payment, items, total})
         });
+        document.getElementById('order-success').textContent = 'Спасибо за заказ!';
+        cart = {};
+        renderCart();
+        renderMenu();
+        setTimeout(() => {
+          document.getElementById('order-success').textContent = '';
+          document.getElementById('order-form').reset();
+        }, 3000);
+      } catch (err) {
+        alert('Ошибка отправки заказа!');
+      }
     };
 
-    // Загрузка меню при старте
+    async function loadMenu() {
+      try {
+        const res = await fetch(MENU_URL);
+        let data = await res.json();
+        // Берём массив из поля menu
+        if (data.menu) data = data.menu;
+        menuData = data.map((item, idx) => ({
+          ...item,
+          price: Number(item.price),
+          available: item.available === true || item.available === "TRUE" || item.available === 1,
+          id: idx + 1 // если нет id в данных, создаём свой
+        }));
+        renderMenu();
+      } catch (e) {
+        alert('Ошибка загрузки меню. Проверьте ссылку!');
+      }
+    }
+
+    // Запуск
+    renderCategories();
     loadMenu();
+    renderCart();
   </script>
 </body>
 </html>
