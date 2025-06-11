@@ -168,13 +168,17 @@
     </div>
   </div>
   <script>
-    // Ваша ссылка Google Apps Script
-    const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
+    // Вставьте сюда токен и chat_id вашего Telegram-бота
+    const TELEGRAM_BOT_TOKEN = 'ВАШ_ТОКЕН_БОТА';
+    const TELEGRAM_CHAT_ID = 'ВАШ_CHAT_ID';
 
+    // Пример меню (замените на загрузку из Google Sheets или API)
     let menuData = [];
     const categories = ['Супы', 'Горячее', 'Гарнир', 'Соусы', 'Напитки'];
     let selectedCategory = categories[0];
     let cart = {};
+
+    // Если хотите загрузку меню из Google Таблицы, используйте функцию loadMenu() как раньше
 
     function renderCategories() {
       const catDiv = document.getElementById('categories');
@@ -196,12 +200,12 @@
       const menuDiv = document.getElementById('menu');
       menuDiv.innerHTML = '';
       menuData
-        .filter(item => item.category.trim() === selectedCategory && item.available)
+        .filter(item => item.category && item.category.trim() === selectedCategory && item.available)
         .forEach(item => {
           const card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = `
-            <img src="${item.img}" alt="${item.name}">
+            <img src="${item.img || ''}" alt="${item.name}">
             <div class="card-title">${item.name}</div>
             <div class="card-price">${item.price} ₽</div>
             <div class="card-controls">
@@ -259,11 +263,23 @@
       const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
       const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
+      const text =
+        `🛒 Новый заказ!\n` +
+        `Имя: ${name}\n` +
+        `Телефон: ${phone}\n` +
+        `Адрес: ${address}\n` +
+        `Оплата: ${payment === 'cash' ? 'Наличные' : 'Картой'}\n` +
+        `Заказ: ${items}\n` +
+        `Сумма: ${total} ₽`;
+
       try {
-        await fetch(MENU_URL, {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name, phone, address, payment, items, total})
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: text
+          })
         });
         document.getElementById('order-success').textContent = 'Спасибо за заказ!';
         cart = {};
@@ -274,26 +290,36 @@
           document.getElementById('order-form').reset();
         }, 3000);
       } catch (err) {
-        alert('Ошибка отправки заказа!');
+        alert('Ошибка отправки заказа в Telegram!');
       }
     };
 
+    // Пример загрузки меню из Google Таблицы через Apps Script (если нужно)
     async function loadMenu() {
-      try {
-        const res = await fetch(MENU_URL);
-        let data = await res.json();
-        // Берём массив из поля menu
-        if (data.menu) data = data.menu;
-        menuData = data.map((item, idx) => ({
-          ...item,
-          price: Number(item.price),
-          available: item.available === true || item.available === "TRUE" || item.available === 1,
-          id: idx + 1 // если нет id в данных, создаём свой
-        }));
-        renderMenu();
-      } catch (e) {
-        alert('Ошибка загрузки меню. Проверьте ссылку!');
-      }
+      // const MENU_URL = 'https://script.google.com/macros/s/ВАШ_СКРИПТ/exec';
+      // try {
+      //   const res = await fetch(MENU_URL);
+      //   let data = await res.json();
+      //   if (data.menu) data = data.menu;
+      //   menuData = data.map((item, idx) => ({
+      //     ...item,
+      //     price: Number(item.price),
+      //     available: item.available === true || item.available === "TRUE" || item.available === 1,
+      //     id: idx + 1
+      //   }));
+      //   renderMenu();
+      // } catch (e) {
+      //   alert('Ошибка загрузки меню. Проверьте ссылку!');
+      // }
+      // Для теста можно использовать статичный массив:
+      menuData = [
+        {id:1, category:'Супы', name:'Борщ', price:250, img:'', available:true},
+        {id:2, category:'Горячее', name:'Котлета', price:170, img:'', available:true},
+        {id:3, category:'Гарнир', name:'Картофель', price:70, img:'', available:true},
+        {id:4, category:'Соусы', name:'Кетчуп', price:20, img:'', available:true},
+        {id:5, category:'Напитки', name:'Морс', price:50, img:'', available:true}
+      ];
+      renderMenu();
     }
 
     // Запуск
