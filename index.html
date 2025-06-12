@@ -18,7 +18,14 @@
     .card-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
     .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
     .remove-btn { background: #ff1744; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-    .cart { background: #23272b; border-radius: 12px; margin-top: 32px; padding: 18px; box-shadow: 0 2px 8px #0004; }
+    .cart {
+      background: #23272b;
+      border-radius: 12px;
+      margin-top: 32px;
+      padding: 18px;
+      box-shadow: 0 2px 8px #0004;
+      min-height: 120px;
+    }
     .cart-list { list-style: none; padding: 0; margin: 0 0 12px 0; }
     .cart-list li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .cart-total { font-size: 20px; color: #ffd600; margin-bottom: 12px; }
@@ -26,9 +33,12 @@
     .order-btn { background: #ffd600; color: #23272b; border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 8px; }
     .order-success {
       color: #00e676;
-      font-size: 18px;
-      margin-top: 16px;
+      font-size: 22px;
+      margin-top: 18px;
+      margin-bottom: 10px;
       text-align: center;
+      font-weight: bold;
+      transition: opacity 0.3s;
     }
   </style>
 </head>
@@ -176,9 +186,14 @@
         cart = {};
         renderCart();
         renderMenu();
+        // Корзина остаётся видимой, чтобы пользователь увидел сообщение
         setTimeout(() => {
           document.getElementById('order-success').textContent = '';
           document.getElementById('order-form').reset();
+          // Если корзина пуста, скрываем её
+          if (Object.keys(cart).length === 0) {
+            document.getElementById('cart').style.display = 'none';
+          }
         }, 4000);
       } catch (err) {
         alert('Ошибка отправки заказа в Telegram!');
