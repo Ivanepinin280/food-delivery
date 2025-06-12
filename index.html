@@ -183,15 +183,15 @@
           })
         });
         document.getElementById('order-success').textContent = 'Ваш заказ принят. Спасибо!';
+        // Очищаем корзину, но оставляем её видимой с сообщением
         cart = {};
         renderCart();
         renderMenu();
+        // Показываем сообщение 4 секунды, потом скрываем корзину и сообщение
         setTimeout(() => {
           document.getElementById('order-success').textContent = '';
           document.getElementById('order-form').reset();
-          if (Object.keys(cart).length === 0) {
-            document.getElementById('cart').style.display = 'none';
-          }
+          document.getElementById('cart').style.display = 'none';
         }, 4000);
       } catch (err) {
         alert('Ошибка отправки заказа в Telegram!');
