@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Заказ принят</title>
+  <style>
+    body { background: #23272b; color: #00e676; font-family: Arial, sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .msg { font-size: 2rem; text-align: center; }
+  </style>
+</head>
+<body>
+  <div class="msg">
+    Ваш заказ принят.<br>Спасибо за заказ!
+  </div>
+</body>
+</html>
