@@ -168,7 +168,11 @@
     </div>
   </div>
   <script>
-    // Ваша ссылка Google Apps Script
+    // Вставьте сюда токен и chat_id вашего Telegram-бота
+    const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
+    const TELEGRAM_CHAT_ID = '7567253745';
+
+    // Если нужно, укажите ссылку для загрузки меню из Google Таблицы
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
     let menuData = [];
@@ -259,11 +263,23 @@
       const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
       const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
+      const text =
+        `🛒 Новый заказ!\n` +
+        `Имя: ${name}\n` +
+        `Телефон: ${phone}\n` +
+        `Адрес: ${address}\n` +
+        `Оплата: ${payment === 'cash' ? 'Наличные' : 'Картой'}\n` +
+        `Заказ: ${items}\n` +
+        `Сумма: ${total} ฿`;
+
       try {
-        await fetch(MENU_URL, {
+        await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({name, phone, address, payment, items, total})
+          body: JSON.stringify({
+            chat_id: TELEGRAM_CHAT_ID,
+            text: text
+          })
         });
         document.getElementById('order-success').textContent = 'Спасибо за заказ!';
         cart = {};
@@ -274,7 +290,7 @@
           document.getElementById('order-form').reset();
         }, 3000);
       } catch (err) {
-        alert('Ошибка отправки заказа!');
+        alert('Ошибка отправки заказа в Telegram!');
       }
     };
 
