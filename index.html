@@ -63,7 +63,6 @@
         </select>
         <button type="submit" class="order-btn">Оформить заказ</button>
       </form>
-      <div class="order-success" id="order-success"></div>
     </div>
   </div>
   <script>
@@ -182,17 +181,8 @@
             text: text
           })
         });
-        document.getElementById('order-success').textContent = 'Ваш заказ принят. Спасибо!';
-        // Очищаем корзину, но оставляем её видимой с сообщением
-        cart = {};
-        renderCart();
-        renderMenu();
-        // Показываем сообщение 4 секунды, потом скрываем корзину и сообщение
-        setTimeout(() => {
-          document.getElementById('order-success').textContent = '';
-          document.getElementById('order-form').reset();
-          document.getElementById('cart').style.display = 'none';
-        }, 4000);
+        // Перенаправление на страницу подтверждения
+        window.location.href = 'success.html';
       } catch (err) {
         alert('Ошибка отправки заказа в Telegram!');
       }
