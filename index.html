@@ -24,7 +24,12 @@
     .cart-total { font-size: 20px; color: #ffd600; margin-bottom: 12px; }
     .order-form input, .order-form select { padding: 8px; margin-bottom: 10px; border-radius: 6px; border: none; width: 100%; font-size: 16px; }
     .order-btn { background: #ffd600; color: #23272b; border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 8px; }
-    .order-success { color: #00e676; font-size: 18px; margin-top: 16px; }
+    .order-success {
+      color: #00e676;
+      font-size: 18px;
+      margin-top: 16px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -38,6 +43,7 @@
       <div class="cart-total" id="cart-total"></div>
       <form class="order-form" id="order-form">
         <input type="text" id="name" placeholder="Имя" required>
+        <input type="text" id="telegram" placeholder="Ник в Telegram (например, @username)" required>
         <input type="tel" id="phone" placeholder="Телефон" required>
         <input type="text" id="address" placeholder="Адрес доставки" required>
         <select id="payment" required>
@@ -55,7 +61,7 @@
     const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
     const TELEGRAM_CHAT_ID = '7567253745';
 
-    // Меню можно загрузить из Google Таблицы или использовать статично для теста
+    // Если нужно, укажите ссылку для загрузки меню из Google Таблицы
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
     let menuData = [];
@@ -140,6 +146,7 @@
     document.getElementById('order-form').onsubmit = async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
+      const telegram = document.getElementById('telegram').value.trim();
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
@@ -149,6 +156,7 @@
       const text =
         `🛒 Новый заказ!\n` +
         `Имя: ${name}\n` +
+        `Telegram: ${telegram}\n` +
         `Телефон: ${phone}\n` +
         `Адрес: ${address}\n` +
         `Оплата: ${payment === 'cash' ? 'Наличные' : 'Картой'}\n` +
@@ -164,14 +172,14 @@
             text: text
           })
         });
-        document.getElementById('order-success').textContent = 'Спасибо за заказ!';
+        document.getElementById('order-success').textContent = 'Ваш заказ принят. Спасибо!';
         cart = {};
         renderCart();
         renderMenu();
         setTimeout(() => {
           document.getElementById('order-success').textContent = '';
           document.getElementById('order-form').reset();
-        }, 3000);
+        }, 4000);
       } catch (err) {
         alert('Ошибка отправки заказа в Telegram!');
       }
