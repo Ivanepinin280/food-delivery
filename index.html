@@ -186,11 +186,9 @@
         cart = {};
         renderCart();
         renderMenu();
-        // Корзина остаётся видимой, чтобы пользователь увидел сообщение
         setTimeout(() => {
           document.getElementById('order-success').textContent = '';
           document.getElementById('order-form').reset();
-          // Если корзина пуста, скрываем её
           if (Object.keys(cart).length === 0) {
             document.getElementById('cart').style.display = 'none';
           }
