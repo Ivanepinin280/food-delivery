@@ -191,12 +191,14 @@
       function showChange() {
         const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
         const cash = Number(cashAmountInput.value);
-        if (cash && cash >= total && total > 0) {
-          changeInfo.textContent = `Сдача: ${cash - total} ฿`;
-          changeInfo.style.display = 'block';
-        } else if (cash && total > 0) {
-          changeInfo.textContent = `Недостаточно для оплаты заказа`;
-          changeInfo.style.display = 'block';
+        if (cash && total > 0) {
+          if (cash >= total) {
+            changeInfo.textContent = `Сдача: ${cash - total} ฿`;
+            changeInfo.style.display = 'block';
+          } else {
+            changeInfo.textContent = `Недостаточно для оплаты заказа`;
+            changeInfo.style.display = 'block';
+          }
         } else {
           changeInfo.textContent = '';
           changeInfo.style.display = 'none';
@@ -221,7 +223,11 @@
         const cash = Number(cashAmount);
         const change = cash - total;
         paymentText = `Наличные (номинал купюры: ${cashAmount})`;
-        changeText = (cash && change >= 0) ? `\nСдача с купюры: ${change} ฿` : '';
+        if (!cashAmount || isNaN(cash) || cash < total) {
+          alert('Номинал купюры меньше суммы заказа! Пожалуйста, укажите корректную сумму.');
+          return;
+        }
+        changeText = `\nСдача с купюры: ${change} ฿`;
       } else if (payment === 'card') {
         paymentText = 'Картой';
       }
