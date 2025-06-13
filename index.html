@@ -194,6 +194,9 @@
         if (cash && cash >= total && total > 0) {
           changeInfo.textContent = `Сдача: ${cash - total} ฿`;
           changeInfo.style.display = 'block';
+        } else if (cash && total > 0) {
+          changeInfo.textContent = `Недостаточно для оплаты заказа`;
+          changeInfo.style.display = 'block';
         } else {
           changeInfo.textContent = '';
           changeInfo.style.display = 'none';
@@ -208,7 +211,7 @@
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
-      const cashAmount = document.getElementById('cashAmount').value.trim();
+      const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
       const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
       const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
