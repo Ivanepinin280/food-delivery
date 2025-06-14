@@ -14,11 +14,10 @@
     .card { background: #2c2f34; border-radius: 12px; box-shadow: 0 2px 8px #0004; width: 220px; padding: 16px; display: flex; flex-direction: column; align-items: center; }
     .card img { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
     .card-title { font-size: 18px; margin-bottom: 6px; color: #ffd600; }
-    .card-desc { font-size: 14px; color: #ccc; margin-bottom: 8px; text-align: center; min-height: 36px; }
     .card-price { font-size: 16px; margin-bottom: 10px; }
     .card-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
     .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-    .remove-btn { background: #888; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+    .remove-btn { background: #ff1744; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
     .cart {
       background: #23272b;
       border-radius: 12px;
@@ -41,35 +40,6 @@
       font-weight: bold;
       transition: opacity 0.3s;
     }
-    .cash-info {
-      background: #333;
-      color: #ffd600;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-    .change-info {
-      color: #ffd600;
-      font-size: 16px;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .contacts {
-      margin-top: 40px;
-      padding: 18px;
-      background: #23272b;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px #0004;
-      color: #ffd600;
-      font-size: 18px;
-      text-align: center;
-    }
-    .contacts a {
-      color: #ffd600;
-      text-decoration: underline;
-      margin: 0 8px;
-    }
   </style>
 </head>
 <body>
@@ -89,21 +59,10 @@
         <select id="payment" required>
           <option value="">Оплата</option>
           <option value="cash">Наличные</option>
-          <option value="card">Перевод по карте</option>
+          <option value="card">Картой</option>
         </select>
-        <div id="cash-fields" style="display:none;">
-          <div class="cash-info">Укажите номинал купюры, чтобы мы могли подготовить сдачу</div>
-          <input type="number" id="cashAmount" placeholder="Номинал купюры (например, 1000)" min="1">
-          <div class="change-info" id="change-info" style="display:none;"></div>
-        </div>
         <button type="submit" class="order-btn">Оформить заказ</button>
       </form>
-    </div>
-    <div class="contacts">
-      <div>Контакты:</div>
-      <div>
-        Telegram: <a href="https://t.me/Fooddom360" target="_blank">@Fooddom360</a>
-      </div>
     </div>
   </div>
   <script>
@@ -111,6 +70,7 @@
     const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
     const TELEGRAM_CHAT_ID = '7567253745';
 
+    // Если нужно, укажите ссылку для загрузки меню из Google Таблицы
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
     let menuData = [];
@@ -145,7 +105,6 @@
           card.innerHTML = `
             <img src="${item.img}" alt="${item.name}">
             <div class="card-title">${item.name}</div>
-            <div class="card-desc">${item.description ? item.description : ''}</div>
             <div class="card-price">${item.price} ฿</div>
             <div class="card-controls">
               <button class="remove-btn" onclick="updateCart(${item.id}, -1)">-</button>
@@ -193,42 +152,6 @@
       cartTotal.textContent = `Итого: ${total} ฿`;
     }
 
-    // Показываем/скрываем поле для сдачи и считаем сдачу
-    document.addEventListener('DOMContentLoaded', function() {
-      const paymentSelect = document.getElementById('payment');
-      const cashFields = document.getElementById('cash-fields');
-      const cashAmountInput = document.getElementById('cashAmount');
-      const changeInfo = document.getElementById('change-info');
-      paymentSelect.addEventListener('change', function() {
-        if (paymentSelect.value === 'cash') {
-          cashFields.style.display = 'block';
-          cashAmountInput.setAttribute('required', 'required');
-          showChange();
-        } else {
-          cashFields.style.display = 'none';
-          cashAmountInput.removeAttribute('required');
-          changeInfo.style.display = 'none';
-        }
-      });
-      cashAmountInput.addEventListener('input', showChange);
-      function showChange() {
-        const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
-        const cash = Number(cashAmountInput.value);
-        if (cash && total > 0) {
-          if (cash >= total) {
-            changeInfo.textContent = `Сдача: ${cash - total} ฿`;
-            changeInfo.style.display = 'block';
-          } else {
-            changeInfo.textContent = `Недостаточно для оплаты заказа`;
-            changeInfo.style.display = 'block';
-          }
-        } else {
-          changeInfo.textContent = '';
-          changeInfo.style.display = 'none';
-        }
-      }
-    });
-
     document.getElementById('order-form').onsubmit = async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
@@ -236,7 +159,6 @@
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
-      const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
       const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
       const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
@@ -244,31 +166,15 @@
       let orderNumber = Number(localStorage.getItem('orderNumber') || '0') + 1;
       localStorage.setItem('orderNumber', orderNumber);
 
-      let paymentText = '';
-      let changeText = '';
-      if (payment === 'cash') {
-        const cash = Number(cashAmount);
-        const change = cash - total;
-        paymentText = `Наличные (номинал купюры: ${cashAmount})`;
-        if (!cashAmount || isNaN(cash) || cash < total) {
-          alert('Номинал купюры меньше суммы заказа! Пожалуйста, укажите корректную сумму.');
-          return;
-        }
-        changeText = `\nСдача с купюры: ${change} ฿`;
-      } else if (payment === 'card') {
-        paymentText = 'Перевод по карте';
-      }
-
       const text =
         `🛒 Новый заказ №${orderNumber}!\n` +
         `Имя: ${name}\n` +
         `Telegram: ${telegram}\n` +
         `Телефон: ${phone}\n` +
         `Адрес: ${address}\n` +
-        `Оплата: ${paymentText}\n` +
+        `Оплата: ${payment === 'cash' ? 'Наличные' : 'Картой'}\n` +
         `Заказ: ${items}\n` +
-        `Сумма: ${total} ฿` +
-        changeText;
+        `Сумма: ${total} ฿`;
 
       try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -294,7 +200,6 @@
         menuData = data.map((item, idx) => ({
           ...item,
           price: Number(item.price),
-          description: item.description || '',
           available: item.available === true || item.available === "TRUE" || item.available === 1,
           id: idx + 1
         }));
