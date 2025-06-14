@@ -54,6 +54,26 @@
       margin-bottom: 8px;
       text-align: center;
     }
+    .delivery-options { margin-top: 20px; }
+    .delivery-option {
+      background: #2c2f34;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border 0.2s;
+    }
+    .delivery-option input[type="radio"] {
+      margin-right: 12px;
+      accent-color: #ffd600;
+    }
+    .delivery-option.selected, .delivery-option:has(input[type="radio"]:checked) {
+      border: 2px solid #ffd600;
+    }
+    .delivery-option img { width: 40px; height: 40px; margin-right: 10px; }
   </style>
 </head>
 <body>
@@ -70,6 +90,31 @@
         <input type="text" id="telegram" placeholder="Ник в Telegram (например, @username)" required>
         <input type="tel" id="phone" placeholder="Телефон" required>
         <input type="text" id="address" placeholder="Адрес доставки" required>
+        <div class="delivery-options">
+          <h2>Выберите способ доставки</h2>
+          <label class="delivery-option">
+            <input type="radio" name="delivery" value="grab" checked>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Grab_logo.svg" alt="Grab">
+            <div>
+              <strong>Доставка через Grab</strong><br>
+              <span style="font-size:14px;color:#ccc;">
+                Быстро, по всему городу<br>
+                Стоимость рассчитывается при оформлении
+              </span>
+            </div>
+          </label>
+          <label class="delivery-option">
+            <input type="radio" name="delivery" value="free">
+            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Free">
+            <div>
+              <strong>Бесплатная доставка</strong><br>
+              <span style="font-size:14px;color:#ccc;">
+                Только для гостей Seven Seas Côte d'Azur<br>
+                Доставка до двери
+              </span>
+            </div>
+          </label>
+        </div>
         <select id="payment" required>
           <option value="">Оплата</option>
           <option value="cash">Наличные</option>
@@ -214,6 +259,7 @@
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
       const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
+      const delivery = document.querySelector('input[name="delivery"]:checked').value;
       const itemsArr = Object.values(cart);
       const total = itemsArr.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
@@ -239,12 +285,20 @@
         paymentText = 'Оплата: Перевод по карте';
       }
 
+      let deliveryText = '';
+      if (delivery === 'grab') {
+        deliveryText = 'Доставка: Grab (быстро, по всему городу, стоимость рассчитывается при оформлении)';
+      } else {
+        deliveryText = 'Доставка: Бесплатная (только для гостей Seven Seas Côte d\'Azur, доставка до двери)';
+      }
+
       const text =
         `🛒 Новый заказ №${orderNumber}!\n` +
         `Имя: ${name}\n` +
         `Telegram: ${telegram}\n` +
         `Телефон: ${phone}\n` +
         `Адрес: ${address}\n` +
+        `${deliveryText}\n` +
         `\nЗаказ:\n${orderLines}\n\n` +
         `${paymentText}\nСумма: ${total} ฿${changeText ? '\n' + changeText : ''}`;
 
