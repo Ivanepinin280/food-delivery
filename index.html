@@ -240,6 +240,10 @@
       const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
       const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
+      // Получаем и увеличиваем номер заказа
+      let orderNumber = Number(localStorage.getItem('orderNumber') || '0') + 1;
+      localStorage.setItem('orderNumber', orderNumber);
+
       let paymentText = '';
       let changeText = '';
       if (payment === 'cash') {
@@ -256,7 +260,7 @@
       }
 
       const text =
-        `🛒 Новый заказ!\n` +
+        `🛒 Новый заказ №${orderNumber}!\n` +
         `Имя: ${name}\n` +
         `Telegram: ${telegram}\n` +
         `Телефон: ${phone}\n` +
@@ -290,7 +294,7 @@
         menuData = data.map((item, idx) => ({
           ...item,
           price: Number(item.price),
-          description: item.description || '', // описание из таблицы
+          description: item.description || '',
           available: item.available === true || item.available === "TRUE" || item.available === 1,
           id: idx + 1
         }));
