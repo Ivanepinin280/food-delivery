@@ -18,7 +18,7 @@
     .card-price { font-size: 16px; margin-bottom: 10px; }
     .card-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
     .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-    .remove-btn { background: #ff1744; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+    .remove-btn { background: #888; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
     .cart {
       background: #23272b;
       border-radius: 12px;
@@ -89,7 +89,7 @@
         <select id="payment" required>
           <option value="">Оплата</option>
           <option value="cash">Наличные</option>
-          <option value="card">Картой</option>
+          <option value="card">Перевод по карте</option>
         </select>
         <div id="cash-fields" style="display:none;">
           <div class="cash-info">Укажите номинал купюры, чтобы мы могли подготовить сдачу</div>
@@ -102,8 +102,7 @@
     <div class="contacts">
       <div>Контакты:</div>
       <div>
-        Telegram: <a href="https://t.me/your_telegram" target="_blank">@Fooddom360</a> |
-        Телефон: <a href="tel:+77001234567">+660825430642</a>
+        Telegram: <a href="https://t.me/Fooddom360" target="_blank">@Fooddom360</a>
       </div>
     </div>
   </div>
@@ -253,7 +252,7 @@
         }
         changeText = `\nСдача с купюры: ${change} ฿`;
       } else if (payment === 'card') {
-        paymentText = 'Картой';
+        paymentText = 'Перевод по карте';
       }
 
       const text =
