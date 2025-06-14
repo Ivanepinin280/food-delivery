@@ -30,7 +30,7 @@
     .cart-list { list-style: none; padding: 0; margin: 0 0 10px 0; }
     .cart-list li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .cart-total { font-size: 18px; color: #ffd600; margin-bottom: 8px; }
-    .order-form input, .order-form select { padding: 8px; margin-bottom: 8px; border-radius: 6px; border: none; width: 100%; font-size: 15px; }
+    .order-form input, .order-form select, .order-form textarea { padding: 8px; margin-bottom: 8px; border-radius: 6px; border: none; width: 100%; font-size: 15px; }
     .order-btn { background: #ffd600; color: #23272b; border: none; border-radius: 8px; padding: 10px 18px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; }
     .order-success {
       color: #00e676;
@@ -132,6 +132,7 @@
           <input type="number" id="cashAmount" placeholder="Номинал купюры (например, 1000)" min="1">
           <div class="change-info" id="change-info" style="display:none;"></div>
         </div>
+        <textarea id="comment" placeholder="Комментарий к заказу (необязательно)" rows="2"></textarea>
         <button type="submit" class="order-btn">Оформить заказ</button>
       </form>
     </div>
@@ -295,6 +296,7 @@
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
       const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
+      const comment = document.getElementById('comment').value.trim();
       const itemsArr = Object.values(cart);
       const total = itemsArr.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
@@ -334,6 +336,7 @@
         `Телефон: ${phone}\n` +
         `Адрес: ${address}\n` +
         `${deliveryText}\n` +
+        (comment ? `Комментарий: ${comment}\n` : '') +
         `\nЗаказ:\n${orderLines}\n\n` +
         `${paymentText}\nСумма: ${total} ฿${changeText ? '\n' + changeText : ''}`;
 
