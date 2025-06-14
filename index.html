@@ -14,6 +14,7 @@
     .card { background: #2c2f34; border-radius: 12px; box-shadow: 0 2px 8px #0004; width: 220px; padding: 16px; display: flex; flex-direction: column; align-items: center; }
     .card img { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
     .card-title { font-size: 18px; margin-bottom: 6px; color: #ffd600; }
+    .card-desc { font-size: 14px; color: #ccc; margin-bottom: 8px; text-align: center; min-height: 36px; }
     .card-price { font-size: 16px; margin-bottom: 10px; }
     .card-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
     .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
@@ -54,6 +55,21 @@
       margin-bottom: 8px;
       text-align: center;
     }
+    .contacts {
+      margin-top: 40px;
+      padding: 18px;
+      background: #23272b;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #0004;
+      color: #ffd600;
+      font-size: 18px;
+      text-align: center;
+    }
+    .contacts a {
+      color: #ffd600;
+      text-decoration: underline;
+      margin: 0 8px;
+    }
   </style>
 </head>
 <body>
@@ -82,6 +98,13 @@
         </div>
         <button type="submit" class="order-btn">Оформить заказ</button>
       </form>
+    </div>
+    <div class="contacts">
+      <div>Контакты:</div>
+      <div>
+        Telegram: <a href="https://t.me/your_telegram" target="_blank">@Fooddom360</a> |
+        Телефон: <a href="tel:+77001234567">+660825430642</a>
+      </div>
     </div>
   </div>
   <script>
@@ -123,6 +146,7 @@
           card.innerHTML = `
             <img src="${item.img}" alt="${item.name}">
             <div class="card-title">${item.name}</div>
+            <div class="card-desc">${item.description ? item.description : ''}</div>
             <div class="card-price">${item.price} ฿</div>
             <div class="card-controls">
               <button class="remove-btn" onclick="updateCart(${item.id}, -1)">-</button>
@@ -267,6 +291,7 @@
         menuData = data.map((item, idx) => ({
           ...item,
           price: Number(item.price),
+          description: item.description || '', // описание из таблицы
           available: item.available === true || item.available === "TRUE" || item.available === 1,
           id: idx + 1
         }));
