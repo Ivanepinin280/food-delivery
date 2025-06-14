@@ -3,77 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <title>Заказ еды</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { background: #23272b; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
     h1, h2 { color: #ffd600; }
-    .categories { display: flex; gap: 12px; margin-bottom: 24px; }
-    .category-btn { background: #333; color: #ffd600; border: none; padding: 10px 18px; border-radius: 8px; cursor: pointer; font-size: 16px; transition: background 0.2s; }
+    .categories { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+    .category-btn { background: #333; color: #ffd600; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: background 0.2s; }
     .category-btn.active, .category-btn:hover { background: #ffd600; color: #23272b; }
-    .menu-list { display: flex; flex-wrap: wrap; gap: 18px; }
-    .card { background: #2c2f34; border-radius: 12px; box-shadow: 0 2px 8px #0004; width: 220px; padding: 16px; display: flex; flex-direction: column; align-items: center; }
-    .card img { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-    .card-title { font-size: 18px; margin-bottom: 6px; color: #ffd600; }
-    .card-price { font-size: 16px; margin-bottom: 10px; }
-    .card-controls { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-    .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
-    .remove-btn { background: #888; color: #fff; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-weight: bold; font-size: 16px; }
+    .menu-list { display: flex; flex-wrap: wrap; gap: 12px; }
+    .card { background: #2c2f34; border-radius: 12px; box-shadow: 0 2px 8px #0004; width: 180px; padding: 12px; display: flex; flex-direction: column; align-items: center; }
+    .card img { width: 90px; height: 70px; object-fit: cover; border-radius: 8px; margin-bottom: 8px; }
+    .card-title { font-size: 16px; margin-bottom: 4px; color: #ffd600; }
+    .card-price { font-size: 15px; margin-bottom: 8px; }
+    .card-controls { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+    .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 15px; }
+    .remove-btn { background: #888; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 15px; }
     .cart {
       background: #23272b;
       border-radius: 12px;
-      margin-top: 32px;
-      padding: 18px;
+      margin-top: 24px;
+      padding: 12px;
       box-shadow: 0 2px 8px #0004;
-      min-height: 120px;
+      min-height: 80px;
     }
-    .cart-list { list-style: none; padding: 0; margin: 0 0 12px 0; }
-    .cart-list li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .cart-total { font-size: 20px; color: #ffd600; margin-bottom: 12px; }
-    .order-form input, .order-form select { padding: 8px; margin-bottom: 10px; border-radius: 6px; border: none; width: 100%; font-size: 16px; }
-    .order-btn { background: #ffd600; color: #23272b; border: none; border-radius: 8px; padding: 12px 24px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 8px; }
+    .cart-list { list-style: none; padding: 0; margin: 0 0 10px 0; }
+    .cart-list li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+    .cart-total { font-size: 18px; color: #ffd600; margin-bottom: 8px; }
+    .order-form input, .order-form select { padding: 8px; margin-bottom: 8px; border-radius: 6px; border: none; width: 100%; font-size: 15px; }
+    .order-btn { background: #ffd600; color: #23272b; border: none; border-radius: 8px; padding: 10px 18px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 8px; width: 100%; }
     .order-success {
       color: #00e676;
-      font-size: 22px;
-      margin-top: 18px;
-      margin-bottom: 10px;
+      font-size: 20px;
+      margin-top: 14px;
+      margin-bottom: 8px;
       text-align: center;
       font-weight: bold;
       transition: opacity 0.3s;
     }
-    .cash-info {
-      background: #333;
-      color: #ffd600;
-      border-radius: 6px;
-      padding: 8px 12px;
-      margin-bottom: 8px;
-      font-size: 15px;
-    }
-    .change-info {
-      color: #ffd600;
-      font-size: 16px;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .delivery-options { margin-top: 20px; }
-    .delivery-option {
-      background: #2c2f34;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 12px;
+    .delivery-buttons { display: flex; gap: 10px; margin-bottom: 12px; }
+    .delivery-btn {
+      flex: 1;
       display: flex;
       align-items: center;
+      justify-content: center;
+      background: #2c2f34;
+      border: 2px solid #333;
+      border-radius: 8px;
+      padding: 8px 4px;
       cursor: pointer;
-      border: 2px solid transparent;
-      transition: border 0.2s;
+      color: #ffd600;
+      font-size: 14px;
+      gap: 8px;
+      transition: border 0.2s, background 0.2s;
+      min-width: 0;
+      min-height: 48px;
+      text-align: left;
     }
-    .delivery-option input[type="radio"] {
-      margin-right: 12px;
-      accent-color: #ffd600;
-    }
-    .delivery-option.selected, .delivery-option:has(input[type="radio"]:checked) {
+    .delivery-btn.selected, .delivery-btn:focus {
       border: 2px solid #ffd600;
+      background: #333;
+      outline: none;
     }
-    .delivery-option img { width: 40px; height: 40px; margin-right: 10px; }
+    .delivery-btn svg, .delivery-btn img {
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    .delivery-desc {
+      font-size: 12px;
+      color: #ccc;
+      margin-top: 2px;
+      line-height: 1.2;
+    }
+    @media (max-width: 600px) {
+      .container { padding: 4px; }
+      .menu-list { gap: 6px; }
+      .card { width: 46vw; min-width: 120px; padding: 7px; }
+      .card img { width: 60px; height: 45px; }
+      .card-title { font-size: 13px; }
+      .card-price { font-size: 12px; }
+      .add-btn, .remove-btn { font-size: 13px; padding: 4px 7px; }
+      .delivery-btn { font-size: 12px; min-height: 38px; padding: 6px 2px; }
+      .order-btn { font-size: 15px; padding: 8px 8px; }
+    }
   </style>
 </head>
 <body>
@@ -85,35 +98,33 @@
       <h2>Корзина</h2>
       <ul class="cart-list" id="cart-list"></ul>
       <div class="cart-total" id="cart-total"></div>
-      <form class="order-form" id="order-form">
+      <form class="order-form" id="order-form" autocomplete="off">
         <input type="text" id="name" placeholder="Имя" required>
         <input type="text" id="telegram" placeholder="Ник в Telegram (например, @username)" required>
         <input type="tel" id="phone" placeholder="Телефон" required>
         <input type="text" id="address" placeholder="Адрес доставки" required>
-        <div class="delivery-options">
-          <h2>Выберите способ доставки</h2>
-          <label class="delivery-option">
-            <input type="radio" name="delivery" value="grab" checked>
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/Grab_logo.svg" alt="Grab">
-            <div>
-              <strong>Доставка через Grab</strong><br>
-              <span style="font-size:14px;color:#ccc;">
-                Быстро, по всему городу<br>
-                Стоимость рассчитывается при оформлении
+        <div>
+          <h2 style="font-size:16px;margin:10px 0 6px 0;">Выберите способ доставки</h2>
+          <div class="delivery-buttons" id="delivery-buttons">
+            <button type="button" class="delivery-btn selected" data-value="grab" tabindex="0">
+              <!-- SVG логотип Grab -->
+              <svg viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <text x="0" y="22" font-size="22" font-family="Arial" fill="#00b14f">Grab</text>
+              </svg>
+              <span>
+                Grab<br>
+                <span class="delivery-desc">Быстро, по всему городу<br>Стоимость рассчитывается при оформлении</span>
               </span>
-            </div>
-          </label>
-          <label class="delivery-option">
-            <input type="radio" name="delivery" value="free">
-            <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Free">
-            <div>
-              <strong>Бесплатная доставка</strong><br>
-              <span style="font-size:14px;color:#ccc;">
-                Только для гостей Seven Seas Côte d'Azur<br>
-                Доставка до двери
+            </button>
+            <button type="button" class="delivery-btn" data-value="free" tabindex="0">
+              <!-- Иконка бесплатной доставки -->
+              <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Free">
+              <span>
+                Бесплатно<br>
+                <span class="delivery-desc">Только для гостей Seven Seas Côte d'Azur<br>Доставка до двери</span>
               </span>
-            </div>
-          </label>
+            </button>
+          </div>
         </div>
         <select id="payment" required>
           <option value="">Оплата</option>
@@ -133,13 +144,25 @@
     // ВСТАВЬТЕ СВОИ ДАННЫЕ!
     const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
     const TELEGRAM_CHAT_ID = '7567253745';
-
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
     let menuData = [];
     const categories = ['Супы', 'Горячее', 'Гарнир', 'Соусы', 'Напитки'];
     let selectedCategory = categories[0];
     let cart = {};
+
+    // Delivery selection logic
+    let selectedDelivery = 'grab';
+    document.addEventListener('DOMContentLoaded', function() {
+      const deliveryBtns = document.querySelectorAll('.delivery-btn');
+      deliveryBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+          deliveryBtns.forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedDelivery = btn.getAttribute('data-value');
+        });
+      });
+    });
 
     function renderCategories() {
       const catDiv = document.getElementById('categories');
@@ -259,7 +282,6 @@
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
       const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
-      const delivery = document.querySelector('input[name="delivery"]:checked').value;
       const itemsArr = Object.values(cart);
       const total = itemsArr.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
@@ -286,7 +308,7 @@
       }
 
       let deliveryText = '';
-      if (delivery === 'grab') {
+      if (selectedDelivery === 'grab') {
         deliveryText = 'Доставка: Grab (быстро, по всему городу, стоимость рассчитывается при оформлении)';
       } else {
         deliveryText = 'Доставка: Бесплатная (только для гостей Seven Seas Côte d\'Azur, доставка до двери)';
