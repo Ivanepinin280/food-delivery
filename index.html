@@ -159,12 +159,31 @@
       const phone = document.getElementById('phone').value.trim();
       const address = document.getElementById('address').value.trim();
       const payment = document.getElementById('payment').value;
-      const items = Object.values(cart).map(i => `${i.name} x${i.qty}`).join(', ');
-      const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
+      const cashAmount = document.getElementById('cashAmount') ? document.getElementById('cashAmount').value.trim() : '';
+      const itemsArr = Object.values(cart);
+      const total = itemsArr.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
 
       // Получаем и увеличиваем номер заказа
       let orderNumber = Number(localStorage.getItem('orderNumber') || '0') + 1;
       localStorage.setItem('orderNumber', orderNumber);
+
+      // Формируем чек
+      let orderLines = itemsArr.map(i => `${i.name} x${i.qty} — ${i.price * i.qty} ฿`).join('\n');
+
+      let paymentText = '';
+      let changeText = '';
+      if (payment === 'cash') {
+        const cash = Number(cashAmount);
+        const change = cash - total;
+        paymentText = `Оплата: Наличные (номинал купюры: ${cashAmount})`;
+        if (!cashAmount || isNaN(cash) || cash < total) {
+          alert('Номинал купюры меньше суммы заказа! Пожалуйста, укажите корректную сумму.');
+          return;
+        }
+        changeText = `Сдача с купюры: ${change} ฿`;
+      } else if (payment === 'card') {
+        paymentText = 'Оплата: Картой';
+      }
 
       const text =
         `🛒 Новый заказ №${orderNumber}!\n` +
@@ -172,9 +191,8 @@
         `Telegram: ${telegram}\n` +
         `Телефон: ${phone}\n` +
         `Адрес: ${address}\n` +
-        `Оплата: ${payment === 'cash' ? 'Наличные' : 'Картой'}\n` +
-        `Заказ: ${items}\n` +
-        `Сумма: ${total} ฿`;
+        `\nЗаказ:\n${orderLines}\n\n` +
+        `${paymentText}\nСумма: ${total} ฿${changeText ? '\n' + changeText : ''}`;
 
       try {
         await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
