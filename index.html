@@ -107,7 +107,6 @@
           <h2 style="font-size:16px;margin:10px 0 6px 0;">Выберите способ доставки</h2>
           <div class="delivery-buttons" id="delivery-buttons">
             <button type="button" class="delivery-btn selected" data-value="grab" tabindex="0">
-              <!-- SVG логотип Grab -->
               <svg viewBox="0 0 100 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <text x="0" y="22" font-size="22" font-family="Arial" fill="#00b14f">Grab</text>
               </svg>
@@ -117,7 +116,6 @@
               </span>
             </button>
             <button type="button" class="delivery-btn" data-value="free" tabindex="0">
-              <!-- Иконка бесплатной доставки -->
               <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" alt="Free">
               <span>
                 Бесплатно<br>
@@ -127,8 +125,6 @@
           </div>
         </div>
         <select id="payment" required>
-          <option value="">Оплата</option>
-          <option value="cash">Наличные</option>
           <option value="card">Перевод по карте</option>
         </select>
         <div id="cash-fields" style="display:none;">
@@ -150,18 +146,71 @@
     const categories = ['Супы', 'Горячее', 'Гарнир', 'Соусы', 'Напитки'];
     let selectedCategory = categories[0];
     let cart = {};
-
-    // Delivery selection logic
     let selectedDelivery = 'grab';
+
     document.addEventListener('DOMContentLoaded', function() {
+      // Delivery buttons logic
       const deliveryBtns = document.querySelectorAll('.delivery-btn');
+      const paymentSelect = document.getElementById('payment');
+      const cashFields = document.getElementById('cash-fields');
+      const cashAmountInput = document.getElementById('cashAmount');
+      const changeInfo = document.getElementById('change-info');
+
+      function setPaymentOptions() {
+        if (selectedDelivery === 'grab') {
+          paymentSelect.innerHTML = `<option value="card">Перевод по карте</option>`;
+          paymentSelect.value = 'card';
+          cashFields.style.display = 'none';
+          cashAmountInput.removeAttribute('required');
+          changeInfo.style.display = 'none';
+        } else {
+          paymentSelect.innerHTML = `
+            <option value="">Оплата</option>
+            <option value="cash">Наличные</option>
+            <option value="card">Перевод по карте</option>
+          `;
+        }
+      }
+
       deliveryBtns.forEach(btn => {
         btn.addEventListener('click', function() {
           deliveryBtns.forEach(b => b.classList.remove('selected'));
           btn.classList.add('selected');
           selectedDelivery = btn.getAttribute('data-value');
+          setPaymentOptions();
         });
       });
+
+      setPaymentOptions();
+
+      paymentSelect.addEventListener('change', function() {
+        if (paymentSelect.value === 'cash') {
+          cashFields.style.display = 'block';
+          cashAmountInput.setAttribute('required', 'required');
+          showChange();
+        } else {
+          cashFields.style.display = 'none';
+          cashAmountInput.removeAttribute('required');
+          changeInfo.style.display = 'none';
+        }
+      });
+      cashAmountInput.addEventListener('input', showChange);
+      function showChange() {
+        const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
+        const cash = Number(cashAmountInput.value);
+        if (cash && total > 0) {
+          if (cash >= total) {
+            changeInfo.textContent = `Сдача: ${cash - total} ฿`;
+            changeInfo.style.display = 'block';
+          } else {
+            changeInfo.textContent = `Недостаточно для оплаты заказа`;
+            changeInfo.style.display = 'block';
+          }
+        } else {
+          changeInfo.textContent = '';
+          changeInfo.style.display = 'none';
+        }
+      }
     });
 
     function renderCategories() {
@@ -238,42 +287,6 @@
       cartTotal.textContent = `Итого: ${total} ฿`;
     }
 
-    // Показываем/скрываем поле для сдачи и считаем сдачу
-    document.addEventListener('DOMContentLoaded', function() {
-      const paymentSelect = document.getElementById('payment');
-      const cashFields = document.getElementById('cash-fields');
-      const cashAmountInput = document.getElementById('cashAmount');
-      const changeInfo = document.getElementById('change-info');
-      paymentSelect.addEventListener('change', function() {
-        if (paymentSelect.value === 'cash') {
-          cashFields.style.display = 'block';
-          cashAmountInput.setAttribute('required', 'required');
-          showChange();
-        } else {
-          cashFields.style.display = 'none';
-          cashAmountInput.removeAttribute('required');
-          changeInfo.style.display = 'none';
-        }
-      });
-      cashAmountInput.addEventListener('input', showChange);
-      function showChange() {
-        const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
-        const cash = Number(cashAmountInput.value);
-        if (cash && total > 0) {
-          if (cash >= total) {
-            changeInfo.textContent = `Сдача: ${cash - total} ฿`;
-            changeInfo.style.display = 'block';
-          } else {
-            changeInfo.textContent = `Недостаточно для оплаты заказа`;
-            changeInfo.style.display = 'block';
-          }
-        } else {
-          changeInfo.textContent = '';
-          changeInfo.style.display = 'none';
-        }
-      }
-    });
-
     document.getElementById('order-form').onsubmit = async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
@@ -333,7 +346,6 @@
             text: text
           })
         });
-        // Перенаправление на страницу подтверждения
         window.location.href = 'success.html';
       } catch (err) {
         alert('Ошибка отправки заказа в Telegram!');
