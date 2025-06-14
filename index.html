@@ -40,6 +40,20 @@
       font-weight: bold;
       transition: opacity 0.3s;
     }
+    .cash-info {
+      background: #333;
+      color: #ffd600;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .change-info {
+      color: #ffd600;
+      font-size: 16px;
+      margin-bottom: 8px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -59,8 +73,13 @@
         <select id="payment" required>
           <option value="">Оплата</option>
           <option value="cash">Наличные</option>
-          <option value="card">Картой</option>
+          <option value="card">Перевод по карте</option>
         </select>
+        <div id="cash-fields" style="display:none;">
+          <div class="cash-info">Укажите номинал купюры, чтобы мы могли подготовить сдачу</div>
+          <input type="number" id="cashAmount" placeholder="Номинал купюры (например, 1000)" min="1">
+          <div class="change-info" id="change-info" style="display:none;"></div>
+        </div>
         <button type="submit" class="order-btn">Оформить заказ</button>
       </form>
     </div>
@@ -70,7 +89,6 @@
     const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
     const TELEGRAM_CHAT_ID = '7567253745';
 
-    // Если нужно, укажите ссылку для загрузки меню из Google Таблицы
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
 
     let menuData = [];
@@ -152,6 +170,42 @@
       cartTotal.textContent = `Итого: ${total} ฿`;
     }
 
+    // Показываем/скрываем поле для сдачи и считаем сдачу
+    document.addEventListener('DOMContentLoaded', function() {
+      const paymentSelect = document.getElementById('payment');
+      const cashFields = document.getElementById('cash-fields');
+      const cashAmountInput = document.getElementById('cashAmount');
+      const changeInfo = document.getElementById('change-info');
+      paymentSelect.addEventListener('change', function() {
+        if (paymentSelect.value === 'cash') {
+          cashFields.style.display = 'block';
+          cashAmountInput.setAttribute('required', 'required');
+          showChange();
+        } else {
+          cashFields.style.display = 'none';
+          cashAmountInput.removeAttribute('required');
+          changeInfo.style.display = 'none';
+        }
+      });
+      cashAmountInput.addEventListener('input', showChange);
+      function showChange() {
+        const total = Object.values(cart).reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
+        const cash = Number(cashAmountInput.value);
+        if (cash && total > 0) {
+          if (cash >= total) {
+            changeInfo.textContent = `Сдача: ${cash - total} ฿`;
+            changeInfo.style.display = 'block';
+          } else {
+            changeInfo.textContent = `Недостаточно для оплаты заказа`;
+            changeInfo.style.display = 'block';
+          }
+        } else {
+          changeInfo.textContent = '';
+          changeInfo.style.display = 'none';
+        }
+      }
+    });
+
     document.getElementById('order-form').onsubmit = async function(e) {
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
@@ -182,7 +236,7 @@
         }
         changeText = `Сдача с купюры: ${change} ฿`;
       } else if (payment === 'card') {
-        paymentText = 'Оплата: Картой';
+        paymentText = 'Оплата: Перевод по карте';
       }
 
       const text =
