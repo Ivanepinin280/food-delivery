@@ -20,6 +20,14 @@
     .card-controls { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
     .add-btn { background: #ffd600; color: #23272b; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 15px; }
     .remove-btn { background: #888; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; cursor: pointer; font-weight: bold; font-size: 15px; }
+    .card-unavailable { opacity: 0.5; }
+    .card-unavailable img { filter: grayscale(1); }
+    .card-unavailable .add-btn,
+    .card-unavailable .remove-btn { background: #ccc !important; color: #fff !important; cursor: not-allowed !important; }
+    .card-unavailable .card-title { color: #ccc; }
+    .card-unavailable .card-price { color: #ccc; }
+    .card-unavailable .card-desc { color: #bbb; }
+    .card-unavailable .not-available { color: #ccc; font-size: 13px; margin-top: 4px; }
     .cart {
       background: #23272b;
       border-radius: 12px;
@@ -140,7 +148,6 @@
     </div>
   </div>
   <script>
-    // ВСТАВЬТЕ СВОИ ДАННЫЕ!
     const TELEGRAM_BOT_TOKEN = '8185882590:AAHPeTq5n9kOFAy6T8trwBVH5MZCaEX0tmc';
     const TELEGRAM_CHAT_ID = '7567253745';
     const MENU_URL = 'https://script.google.com/macros/s/AKfycbxu0lkODTN7jGBCqYbsNA0-njTGFfzqQ878N4iDW2w-VW6-fScQf0ku2PAtxxq_c3lN/exec';
@@ -236,20 +243,22 @@
       const menuDiv = document.getElementById('menu');
       menuDiv.innerHTML = '';
       menuData
-        .filter(item => item.category && item.category.trim() === selectedCategory && item.available)
+        .filter(item => item.category && item.category.trim() === selectedCategory)
         .forEach(item => {
+          const isAvailable = item.available === true || item.available === "TRUE" || item.available === 1;
           const card = document.createElement('div');
-          card.className = 'card';
+          card.className = 'card' + (!isAvailable ? ' card-unavailable' : '');
           card.innerHTML = `
             <img src="${item.img}" alt="${item.name}">
             <div class="card-title">${item.name}</div>
             <div class="card-desc">${item.description ? item.description : ''}</div>
             <div class="card-price">${item.price} ฿</div>
             <div class="card-controls">
-              <button class="remove-btn" onclick="updateCart(${item.id}, -1)">-</button>
+              <button class="remove-btn" onclick="updateCart(${item.id}, -1)" ${!isAvailable ? 'disabled' : ''}>-</button>
               <span id="qty-${item.id}">${cart[item.id]?.qty || 0}</span>
-              <button class="add-btn" onclick="updateCart(${item.id}, 1)">+</button>
+              <button class="add-btn" onclick="updateCart(${item.id}, 1)" ${!isAvailable ? 'disabled' : ''}>+</button>
             </div>
+            ${!isAvailable ? '<div class="not-available">Нет в наличии</div>' : ''}
           `;
           menuDiv.appendChild(card);
         });
@@ -258,6 +267,7 @@
     window.updateCart = function(id, delta) {
       const item = menuData.find(i => Number(i.id) === Number(id));
       if (!item) return;
+      if (!(item.available === true || item.available === "TRUE" || item.available === 1)) return;
       if (!cart[id]) cart[id] = { ...item, qty: 0 };
       let newQty = cart[id].qty + delta;
       newQty = Math.max(0, newQty);
