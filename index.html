@@ -245,7 +245,7 @@
       menuData
         .filter(item => item.category && item.category.trim() === selectedCategory)
         .forEach(item => {
-          const isAvailable = item.available === true || item.available === "TRUE" || item.available === 1;
+          const isAvailable = !!item.available;
           const card = document.createElement('div');
           card.className = 'card' + (!isAvailable ? ' card-unavailable' : '');
           card.innerHTML = `
@@ -267,7 +267,7 @@
     window.updateCart = function(id, delta) {
       const item = menuData.find(i => Number(i.id) === Number(id));
       if (!item) return;
-      if (!(item.available === true || item.available === "TRUE" || item.available === 1)) return;
+      if (!item.available) return;
       if (!cart[id]) cart[id] = { ...item, qty: 0 };
       let newQty = cart[id].qty + delta;
       newQty = Math.max(0, newQty);
@@ -376,7 +376,7 @@
         menuData = data.map((item, idx) => ({
           ...item,
           price: Number(item.price),
-          available: item.available === true || item.available === "TRUE" || item.available === 1,
+          available: String(item.available).trim().toLowerCase() === "true",
           id: idx + 1
         }));
         renderMenu();
