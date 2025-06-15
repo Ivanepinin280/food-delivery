@@ -243,7 +243,7 @@
           card.innerHTML = `
             <img src="${item.img}" alt="${item.name}">
             <div class="card-title">${item.name}</div>
-            <div class="card-desc">${item.desc ? item.desc : ''}</div>
+            <div class="card-desc">${item.description ? item.description : ''}</div>
             <div class="card-price">${item.price} ฿</div>
             <div class="card-controls">
               <button class="remove-btn" onclick="updateCart(${item.id}, -1)">-</button>
