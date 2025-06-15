@@ -2,11 +2,32 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Заказ еды</title>
+  <title>Fooddom — Заказ еды</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
     body { background: #23272b; color: #fff; font-family: Arial, sans-serif; margin: 0; padding: 0; }
     .container { max-width: 900px; margin: 0 auto; padding: 16px; }
+    .brand {
+      text-align: center;
+      margin-top: 32px;
+      margin-bottom: 10px;
+    }
+    .brand-title {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 48px;
+      font-weight: bold;
+      color: #ffd600;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 12px #000a;
+    }
+    .brand-city {
+      font-size: 22px;
+      color: #ffd600;
+      margin-top: 2px;
+      letter-spacing: 1px;
+      font-weight: 500;
+      text-shadow: 0 1px 6px #0008;
+    }
     h1, h2 { color: #ffd600; }
     .categories { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
     .category-btn { background: #333; color: #ffd600; border: none; padding: 8px 14px; border-radius: 8px; cursor: pointer; font-size: 15px; transition: background 0.2s; }
@@ -85,8 +106,17 @@
       margin-top: 2px;
       line-height: 1.2;
     }
+    .contact-info {
+      text-align: center;
+      margin-bottom: 18px;
+      color: #ffd600;
+      font-size: 16px;
+      letter-spacing: 1px;
+    }
     @media (max-width: 600px) {
       .container { padding: 4px; }
+      .brand-title { font-size: 32px; }
+      .brand-city { font-size: 15px; }
       .menu-list { gap: 6px; }
       .card { width: 46vw; min-width: 120px; padding: 7px; }
       .card img { width: 60px; height: 45px; }
@@ -96,11 +126,19 @@
       .add-btn, .remove-btn { font-size: 13px; padding: 4px 7px; }
       .delivery-btn { font-size: 12px; min-height: 38px; padding: 6px 2px; }
       .order-btn { font-size: 15px; padding: 8px 8px; }
+      .contact-info { font-size: 13px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="brand">
+      <div class="brand-title">Fooddom</div>
+      <div class="brand-city">Pattaya</div>
+    </div>
+    <div class="contact-info">
+      По всем вопросам: <b>@fooddom361</b>
+    </div>
     <h1>Заказ еды</h1>
     <div class="categories" id="categories"></div>
     <div class="menu-list" id="menu"></div>
@@ -312,6 +350,12 @@
       const comment = document.getElementById('comment').value.trim();
       const itemsArr = Object.values(cart);
       const total = itemsArr.reduce((sum, i) => sum + Number(i.price) * i.qty, 0);
+
+      // Проверка обязательных полей
+      if (!name || !telegram || !phone || !address) {
+        alert('Пожалуйста, заполните все поля! Если нет контактной информации, свяжитесь с нами: @fooddom361');
+        return;
+      }
 
       // Получаем и увеличиваем номер заказа
       let orderNumber = Number(localStorage.getItem('orderNumber') || '0') + 1;
